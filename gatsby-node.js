@@ -46,15 +46,27 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     if(!TAGS) return [];
     
     //find entries with tags in common
-    console.log("articleId : ", ARTICLE_ID);
-    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id))).map(item => item.node.contentful_id)];
+    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id)))];
 
-    console.log("contentful_ids : ", related);
-    console.log("=====");
+    console.log("article : ", ARTICLE_ID," related_ids : ", related);
     
     //sort by max tags in common
-    //related = [...related.sort((a,b) =>{})
-    return related; 
+    related = related.length > 0 && [...related.sort((a,b) => {
+      function countRelated(article){ 
+        console.log("article_",article);
+        let count;
+        article.node.metadata.tags.forEach(tag => TAGS.includes(tag) && count++);
+        return count;
+      };
+      return countRelated(a) > countRelated(b);  
+    })];
+
+    //return article ids
+    relatedIds = related.map(item => item.node.contentful_id);
+    console.log("sorted ids : ", relatedIds);
+    console.log("=====");
+
+    return relatedIds; 
   }
   
   // Create post detail pages
