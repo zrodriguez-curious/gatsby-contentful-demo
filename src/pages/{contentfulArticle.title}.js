@@ -56,7 +56,8 @@ const Page = ({ data }) => {
         : <p>No data yet...</p>
       }
       </ol>
-      <pre>{JSON.stringify(related, null, 2)}</pre>
+      <p><strong>raw</strong></p>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
      </>
  );
 };
