@@ -41,13 +41,16 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   const articles = result.data.allContentfulArticle.edges;
   // const tags = result.data.contentfulArticle.metadata.tags;
 
-  const findRelated = (ARTICLES, TAGS, MAX_ENTRIES) =>{
+  const findRelated = (ARTICLES, ARTICLE_ID, TAGS, MAX_ENTRIES) =>{
+
+    if(!TAGS) return [];
     
-    //let related = [];
     //find entries with tags in common
-    // console.log("article", JSON.stringify(articles.map(article => article.node), null,2));
-    let related = [...ARTICLES.filter(article => article.node.metadata.tags.some( tag => TAGS.includes(tag))).map(item => item.node.contentful_id)];
-    console.log("contentful_ids",related);
+    console.log("articleId : ", ARTICLE_ID);
+    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id))).map(item => item.node.contentful_id)];
+
+    console.log("contentful_ids : ", related);
+    console.log("=====");
     
     //sort by max tags in common
     //related = [...related.sort((a,b) =>{})
@@ -62,7 +65,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       context: {
         id: node.id,
         //relatedArticles: ["1N1O4CRiW7czoDIN7e1kXJ","4ezUdy1GeM3RuYZiMI6diy","7Fy41Y04OPrmIx1bv1Td1i"],
-        relatedArticles: findRelated(articles, node.metadata.tags, 3),
+        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3),
       }
     })
   })
