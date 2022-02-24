@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "develop": "gatsby develop",
+    "dev-debug": "node --nolazy node_modules/.bin/gatsby develop --inspect-brk",
     "build": "gatsby build",
     "clean": "gatsby clean",
     "serve": "gatsby serve",
@@ -32,6 +33,7 @@
     "gatsby-source-contentful": "^7.4.0",
     "gatsby-source-filesystem": "^4.7.0",
     "gatsby-transformer-sharp": "^4.7.0",
+    "path": "^0.12.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }

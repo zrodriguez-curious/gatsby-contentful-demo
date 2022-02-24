@@ -1,7 +1,9 @@
+const path = require('path');
+
 exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions
-  const result = await graphql`
-    query($id: String) {
+  const result = await graphql(`
+    query ($id: String) {
       contentfulArticle(id: {eq: $id}) {
         contentful_id
         title
@@ -29,7 +31,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
         }
       }
     }
-  `
+  `)
 
   // handle errors
   if (result.errors) {
@@ -37,29 +39,30 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     return
   }
   const articles = result.data.allContentfulArticle.edges;
-  const tags = result.data.contentfulArticle.metadata.tags;
-  
-  const findRelated = (tags, MAX_ENTRIES) =>{
-    let related = [];
-    //find entries with any tags in common
-    related = [...articles.filter(article => article.metadata.tags.some( tag => tags.includes(tag)))];
+  // const tags = result.data.contentfulArticle.metadata.tags;
+
+  const findRelated = (ARTICLES, TAGS, MAX_ENTRIES) =>{
+    
+    //let related = [];
+    //find entries with tags in common
+    // console.log("article", JSON.stringify(articles.map(article => article.node), null,2));
+    let related = [...ARTICLES.filter(article => article.node.metadata.tags.some( tag => TAGS.includes(tag))).map(item => item.node.contentful_id)];
+    console.log("contentful_ids",related);
     
     //sort by max tags in common
     //related = [...related.sort((a,b) =>{})
-
-    related = [...related.slice(0, MAX_ENTRIES)];
-    console.log("related1 : ", related);
-
-    return related;
+    return related; 
   }
-
+  
   // Create post detail pages
   articles.forEach(({ node }) => {
     createPage({
-      path: node.fields.title,
-      component: "./src/pages/{contentfulArticle.title}.js",
+      path: `created-${node.title}`,
+      component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
-        relatedArticles: findRelated(node.metadata.tags, 3),
+        id: node.id,
+        //relatedArticles: ["1N1O4CRiW7czoDIN7e1kXJ","4ezUdy1GeM3RuYZiMI6diy","7Fy41Y04OPrmIx1bv1Td1i"],
+        relatedArticles: findRelated(articles, node.metadata.tags, 3),
       }
     })
   })

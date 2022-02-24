@@ -5,10 +5,10 @@ const RelatedTagItem = (props) => {
   const itemTags = item.metadata.tags;
   return (
     <li>
-      <h4>{item.fields.title}</h4>
+      <h4>{item.title}</h4>
       <p>Tags:</p>
       <ul>
-        {itemTags && itemTags.map( (tag, index) => <li item={item} key={index}>{tag.sys.id}</li>)}
+        {itemTags && itemTags.map( (tag, index) => <li key={index}>{tag.contentful_id}</li>)}
       </ul>
     </li>
   );

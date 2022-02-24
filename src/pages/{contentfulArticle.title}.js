@@ -8,9 +8,10 @@ const Page = ({ data }) => {
 
   const [related, setRelated] = React.useState([]);
 
-  // React.useEffect(()=>{
-  //   queryRelated();
-  // },[])
+  React.useEffect(()=>{
+    // queryRelated();
+    setRelated(data.relatedArticles.edges)
+  },[])
 
   function queryRelated (){
     const MAX_ENTRIES = 3; //maximum related articles that we want
@@ -42,21 +43,26 @@ const Page = ({ data }) => {
     
   return (
     <>
-      <h2>{data.contentfulArticle.blurb}</h2>
-      <p>{data.contentfulArticle.content}</p>
+      <h2>{data.contentfulArticle.title}</h2>
+      <p>{data.contentfulArticle.blurb}</p>
+      <p>my tags:</p>
+      <ul>
+        {data.contentfulArticle.metadata.tags.map(tag => <li>{tag.contentful_id}</li>)}
+      </ul>
       <h3>Related by tag:</h3>
       <ol>
         {related && related.length > 0 ?  
-          related.map((item, index) => <RelatedTagItem item={item} key={index} />)
+          related.map((item, index) => <RelatedTagItem item={item.node} key={index} />)
         : <p>No data yet...</p>
       }
       </ol>
+      <pre>{JSON.stringify(related, null, 2)}</pre>
      </>
  );
 };
 
 export const data = graphql`
-query ($id: String, $ids: StringQueryOperatorInput) {
+query ($id: String, $relatedArticles: [String]) {
   contentfulArticle(id: {eq: $id}) {
     contentful_id
     title
@@ -67,7 +73,7 @@ query ($id: String, $ids: StringQueryOperatorInput) {
       }
     }
   }
-  allContentfulArticle(filter: {contentful_id:  $ids}) {
+  relatedArticles: allContentfulArticle(filter: {contentful_id: {in: $relatedArticles}}) {
     edges {
       node {
         title
