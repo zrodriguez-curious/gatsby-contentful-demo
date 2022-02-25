@@ -39,7 +39,6 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     return
   }
   const articles = result.data.allContentfulArticle.edges;
-  // const tags = result.data.contentfulArticle.metadata.tags;
 
   const findRelated = (ARTICLES, ARTICLE_ID, TAGS, MAX_ENTRIES) =>{
 
@@ -47,25 +46,19 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     
     //find entries with tags in common
     let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id)))];
-
-    console.log("article : ", ARTICLE_ID," related_ids : ", related);
     
     //sort by max tags in common
     related = related.length > 0 && [...related.sort((a,b) => {
       function countRelated(article){ 
-        console.log("article_",article);
-        let count;
-        article.node.metadata.tags.forEach(tag => TAGS.includes(tag) && count++);
+        let count = 0;
+        article.node.metadata.tags.forEach(tag => TAGS.includes(tag.contentful_id) && count++);
         return count;
       };
-      return countRelated(a) > countRelated(b);  
+      return countRelated(b) - countRelated(a);  
     })];
 
     //return article ids
-    relatedIds = related.map(item => item.node.contentful_id);
-    console.log("sorted ids : ", relatedIds);
-    console.log("=====");
-
+    relatedIds = related.length > 0 && related.map(item => item.node.contentful_id).slice(0, MAX_ENTRIES);
     return relatedIds; 
   }
   
@@ -76,8 +69,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        //relatedArticles: ["1N1O4CRiW7czoDIN7e1kXJ","4ezUdy1GeM3RuYZiMI6diy","7Fy41Y04OPrmIx1bv1Td1i"],
-        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3),
+        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3, node.title),
       }
     })
   })
