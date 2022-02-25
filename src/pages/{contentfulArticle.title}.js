@@ -12,19 +12,21 @@ const Page = ({ data }) => {
       <>
         <h2>{data.contentfulArticle.title}</h2>
         <p>{data.contentfulArticle.blurb}</p>
-        <p>my tags:</p>
+        <p>My tags:</p>
         <ul>
           {data.contentfulArticle.metadata.tags.map(tag => <li>{tag.contentful_id}</li>)}
         </ul>
+        <hr />
         <h3>Related by tag:</h3>
-        <ol>
+        <ul>
           {data.relatedArticles.edges && data.relatedArticles.edges.length > 0 ?  
             data.relatedArticles.edges.map((item, index) => <RelatedTagItem item={item.node} key={index} />)
           : <p>No data yet...</p>
         }
-        </ol>
+        </ul>
       </>
       }
+      <hr />
       <p><strong>Raw:</strong></p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
       <a href="#">^Top</a><br />
