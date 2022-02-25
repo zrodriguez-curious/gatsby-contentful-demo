@@ -6,7 +6,7 @@ const Index = ({data}) => {
     <main>
         <h1>All articles:</h1>
         <ul>
-            {data.allContentfulArticle.edges.map((article, index) => <li key={index}><Link to={`/${article.node.title}`}>{article.node.title}</Link></li>)}
+            {data.allContentfulArticle.edges.map((article, index) => <li key={index}><Link to={article.node.title}>{article.node.title}</Link></li>)}
         </ul>
     </main>
   );
