@@ -1,11 +1,12 @@
 import React from 'react';
-import { graphql } from 'gatsby';
+import { graphql, Link } from 'gatsby';
 
 import RelatedTagItem from '../components/RelatedTagItem';
 
 const Page = ({ data }) => {     
   return (
     <>
+    <Link to="/"> ← Back to Index</Link>
     {!data.contentfulArticle ?
       <p>No article found</p> :
       <>
@@ -26,6 +27,8 @@ const Page = ({ data }) => {
       }
       <p><strong>Raw:</strong></p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
+      <a href="#">^Top</a><br />
+      <Link to="/"> ← Back to index</Link>
     </>
  );
 };

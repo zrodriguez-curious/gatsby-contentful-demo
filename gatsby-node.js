@@ -71,7 +71,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   // Create post detail pages
   articles.forEach(({ node }) => {
     createPage({
-      path: `created-${node.title}`,
+      path: `${node.title}`,
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
