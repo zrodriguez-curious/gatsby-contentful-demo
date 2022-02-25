@@ -1,6 +1,9 @@
 const path = require('path');
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
+  
+  const MAX_ENTRIES = 3; // # related articles you want to query
+  
   const { createPage } = actions
   const result = await graphql(`
     query ($id: String) {
@@ -72,9 +75,9 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3),
+        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
+        limit: MAX_ENTRIES,
       }
     })
   })
-
 }

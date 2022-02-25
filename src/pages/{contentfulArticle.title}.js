@@ -1,40 +1,10 @@
 import React from 'react';
 import { graphql } from 'gatsby';
-import * as contentful from 'contentful';
 
 import RelatedTagItem from '../components/RelatedTagItem';
 
-const Page = ({ data }) => { 
-  // function queryRelated (){
-  //   const MAX_ENTRIES = 3; //maximum related articles that we want
-  //   const TAGS = data.contentfulArticle.metadata.tags.map(tag => tag.contentful_id).join();
-
-  //   /* query articles with related tags and store in state */
-  //     const client = contentful.createClient({
-  //       space: "tkehvr0h8fou",
-  //       accessToken: "LjALFtRQ13-x8veoRDst8N0-J9N4L2J7gRS9GI2V3gc"
-  //     });
-
-  //       //first try to get articles that match ALL tags      
-  //     client
-  //       .getEntries({'metadata.tags.sys.id[all]': TAGS, limit: MAX_ENTRIES})
-  //       .then(allEntries => {
-  //         let resultsList = [...allEntries.items];
-          
-  //         //if we get less than the number of results we want, query results that match ANY tags
-  //         return resultsList.length >= MAX_ENTRIES ? [...resultsList.items].slice(0, MAX_ENTRIES) 
-  //           : client.getEntries({'metadata.tags.sys.id[in]': TAGS, limit: MAX_ENTRIES})
-  //             .then(anyEntries => resultsList = [...resultsList, ...anyEntries.items].slice(0, MAX_ENTRIES));
-  //       })
-  //       .then(data => {
-  //         console.log("res : ", data);
-  //         setRelated(data);
-  //       })
-  //       .catch(err => console.log(err));
-  //     }
-    
+const Page = ({ data }) => {     
   return (
-
     <>
     {!data.contentfulArticle ?
       <p>No article found</p> :
@@ -61,7 +31,7 @@ const Page = ({ data }) => {
 };
 
 export const data = graphql`
-query ($id: String, $relatedArticles: [String]) {
+query ($id: String, $relatedArticles: [String], $limit: Int) {
   contentfulArticle(id: {eq: $id}) {
     contentful_id
     title
@@ -72,7 +42,7 @@ query ($id: String, $relatedArticles: [String]) {
       }
     }
   }
-  relatedArticles: allContentfulArticle(filter: {contentful_id: {in: $relatedArticles}}) {
+  relatedArticles: allContentfulArticle(filter: {contentful_id: {in: $relatedArticles}}, limit: $limit) {
     edges {
       node {
         title
