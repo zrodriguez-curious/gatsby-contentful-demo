@@ -36,7 +36,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   // handle errors
   if (result.errors) {
     reporter.panicOnBuild(`Error while running GraphQL query.`)
-    return
+    return;
   }
   const articles = result.data.allContentfulArticle.edges;
 
@@ -48,18 +48,21 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id)))];
     
     //sort by max tags in common
-    related = related.length > 0 && [...related.sort((a,b) => {
-      function countRelated(article){ 
-        let count = 0;
-        article.node.metadata.tags.forEach(tag => TAGS.includes(tag.contentful_id) && count++);
-        return count;
-      };
+    related = related.length > 0 ? 
+      [...related.sort((a,b) => {
+        function countRelated(article){ 
+          let count = 0;
+          article.node.metadata.tags.forEach(tag => TAGS.includes(tag.contentful_id) && count++);
+          return count;
+        };
       return countRelated(b) - countRelated(a);  
-    })];
+    })] : related;
+
+    //if there are less than MAX_ENTRIES articles, add random articles to the end
+    related = related.length < MAX_ENTRIES ? [...related, ...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && !related.map(item => item.contentful_id).includes(article.node.contentful_id)).slice(0, MAX_ENTRIES - related.length)] : related;
 
     //return article ids
-    relatedIds = related.length > 0 && related.map(item => item.node.contentful_id).slice(0, MAX_ENTRIES);
-    return relatedIds; 
+    return related.length > 0 ? related.map(item => item.node.contentful_id).slice(0, MAX_ENTRIES) : [];
   }
   
   // Create post detail pages
@@ -69,7 +72,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3, node.title),
+        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), 3),
       }
     })
   })
