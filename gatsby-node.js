@@ -10,7 +10,6 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       contentfulArticle(id: {eq: $id}) {
         contentful_id
         title
-        blurb
         metadata {
           tags {
             contentful_id
@@ -44,14 +43,13 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   const articles = result.data.allContentfulArticle.edges;
 
   const findRelated = (ARTICLES, ARTICLE_ID, TAGS, MAX_ENTRIES) =>{
-
     if(!TAGS) return [];
     
     //find entries with tags in common
-    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id)))];
+    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id) ))];
     
     //sort by max tags in common
-    related = related.length > 0 ? 
+    if(related.length > 0) related = 
       [...related.sort((a,b) => {
         function countRelated(article){ 
           let count = 0;
@@ -59,10 +57,10 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
           return count;
         };
       return countRelated(b) - countRelated(a);  
-    })] : related;
+    })];
 
     //if there are less than MAX_ENTRIES articles, add random articles to the end
-    related = related.length < MAX_ENTRIES ? [...related, ...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && !related.map(item => item.contentful_id).includes(article.node.contentful_id)).slice(0, MAX_ENTRIES - related.length)] : related;
+    if(related.length < MAX_ENTRIES) related = [...related, ...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && !related.map(item => item.contentful_id).includes(article.node.contentful_id)).slice(0, MAX_ENTRIES - related.length)];
 
     //return article ids
     return related.length > 0 ? related.map(item => item.node.contentful_id).slice(0, MAX_ENTRIES) : [];
