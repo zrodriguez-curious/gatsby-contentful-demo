@@ -1,4 +1,5 @@
 const path = require('path');
+const {relatedArticlesByTag} = require('./scripts/relatedArticlesByTag');
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
   
@@ -41,30 +42,6 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     return;
   }
   const articles = result.data.allContentfulArticle.edges;
-
-  const findRelated = (ARTICLES, ARTICLE_ID, TAGS, MAX_ENTRIES) =>{
-    if(!TAGS) return [];
-    
-    //find entries with tags in common
-    let related = [...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && article.node.metadata.tags.some( tag => TAGS.includes(tag.contentful_id) ))];
-    
-    //sort by max tags in common
-    if(related.length > 0) related = 
-      [...related.sort((a,b) => {
-        function countRelated(article){ 
-          let count = 0;
-          article.node.metadata.tags.forEach(tag => TAGS.includes(tag.contentful_id) && count++);
-          return count;
-        };
-      return countRelated(b) - countRelated(a);  
-    })];
-
-    //if there are less than MAX_ENTRIES articles, add random articles to the end
-    if(related.length < MAX_ENTRIES) related = [...related, ...ARTICLES.filter(article => article.node.contentful_id != ARTICLE_ID && !related.map(item => item.contentful_id).includes(article.node.contentful_id)).slice(0, MAX_ENTRIES - related.length)];
-
-    //return article ids
-    return related.length > 0 ? related.map(item => item.node.contentful_id).slice(0, MAX_ENTRIES) : [];
-  }
   
   // Create post detail pages
   articles.forEach(({ node }) => {
@@ -73,7 +50,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        relatedArticles: findRelated(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
+        relatedArticles: relatedArticlesByTag(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
         limit: MAX_ENTRIES,
       }
     })
