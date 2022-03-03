@@ -50,7 +50,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        relatedArticles: relatedArticlesByTag(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
+        relatedArticles: relatedArticlesByTag(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES,{table: true, returnTable: "log"}),
         limit: MAX_ENTRIES,
       }
     })

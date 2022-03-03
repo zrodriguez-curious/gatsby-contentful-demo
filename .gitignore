@@ -5,3 +5,4 @@ tokens
 .cache
 node_modules
 public
+*copy.js
