@@ -6,18 +6,18 @@ import {sortRelatedTags} from '../../scripts/relatedArticlesByTag';
 
 const Page = ({ data }) => {     
   const relatedArticles = sortRelatedTags(data.relatedArticles.edges, data.contentfulArticle.metadata.tags.map(tag => tag.contentful_id));
-
+  const article = data.contentfulArticle;
   return (
     <>
     <Link to="/"> ← Back to Index</Link>
-    {!data.contentfulArticle ?
+    {!article ?
       <p>No article found</p> :
       <>
-        <h2>{data.contentfulArticle.title}</h2>
-        <p>{data.contentfulArticle.blurb}</p>
+        <h2>{article.title}</h2>
+        <p>{article.blurb}</p>
         <p>My tags:</p>
         <ul>
-          {data.contentfulArticle.metadata.tags.map(tag => <li>{tag.contentful_id}</li>)}
+          {article.metadata.tags.map(tag => <li>{tag.contentful_id}</li>)}
         </ul>
         <hr />
         <h3>Related by tag:</h3>

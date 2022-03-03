@@ -1,9 +1,9 @@
 function sortRelated(a, b, tags, {ties = "date"}={}){
   function countRelated(article){ 
-  let count = 0;
-  article.node.metadata.tags.forEach(articleTag => tags.includes(articleTag.contentful_id) && ++count);        
-  return count;
-};
+    let count = 0;
+    article.node.metadata.tags.forEach(articleTag => tags.includes(articleTag.contentful_id) && ++count);        
+    return count;
+  };
 
   if (countRelated(a) > countRelated(b)) {
     return -1;
@@ -12,6 +12,7 @@ function sortRelated(a, b, tags, {ties = "date"}={}){
     return 1;
   }
 
+  //handle ties
   if(ties === "random") return Math.random() > .5 ? 1 : -1;
   else if(ties === "date"){
     if (a.node.createdAt > b.node.createdAt) {
@@ -21,7 +22,6 @@ function sortRelated(a, b, tags, {ties = "date"}={}){
       return 1;
     }
   }
-
   return 0
 }
 
@@ -52,5 +52,5 @@ exports.sortRelatedTags = (ARTICLES, TAGS) => {
   if(!TAGS) return [];
   
   //sort by max tags in common
-  return [...ARTICLES.sort((a,b) => sortRelated(a,b,TAGS))];
+  return ARTICLES.sort((a,b) => sortRelated(a,b,TAGS));
 }
