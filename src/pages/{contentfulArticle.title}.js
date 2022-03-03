@@ -2,8 +2,11 @@ import React from 'react';
 import { graphql, Link } from 'gatsby';
 
 import RelatedTagItem from '../components/RelatedTagItem';
+import {sortRelatedTags} from '../../scripts/relatedArticlesByTag';
 
 const Page = ({ data }) => {     
+  const relatedArticles = sortRelatedTags(data.relatedArticles.edges, data.contentfulArticle.metadata.tags.map(tag => tag.contentful_id));
+
   return (
     <>
     <Link to="/"> ← Back to Index</Link>
@@ -19,8 +22,8 @@ const Page = ({ data }) => {
         <hr />
         <h3>Related by tag:</h3>
         <ul>
-          {data.relatedArticles.edges && data.relatedArticles.edges.length > 0 ?  
-            data.relatedArticles.edges.map((item, index) => <RelatedTagItem item={item.node} key={index} />)
+          {relatedArticles && relatedArticles.length > 0 ?  
+            relatedArticles.map((item, index) => <RelatedTagItem item={item.node} key={index} />)
           : <p>No data yet...</p>
         }
         </ul>

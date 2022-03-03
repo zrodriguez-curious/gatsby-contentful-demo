@@ -1,5 +1,5 @@
 const path = require('path');
-const {relatedArticlesByTag} = require('./scripts/relatedArticlesByTag');
+const {getRelatedTags} = require('./scripts/relatedArticlesByTag');
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
   
@@ -50,7 +50,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: path.resolve("src/pages/{contentfulArticle.title}.js"),
       context: {
         id: node.id,
-        relatedArticles: relatedArticlesByTag(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
+        relatedArticles: getRelatedTags(articles, node.contentful_id, node.metadata.tags.map(tag => tag.contentful_id), MAX_ENTRIES),
         limit: MAX_ENTRIES,
       }
     })
